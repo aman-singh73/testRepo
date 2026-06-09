@@ -136,3 +136,41 @@ module "main_react_app_app" {
   sku_tier            = "Free"
   tags                = var.tags
 }
+resource "azurerm_network_interface" "perf_test_nic" {
+  name                = "perf-test-nic"
+  location            = "eastus2"
+  resource_group_name = azurerm_resource_group.main.name  # use your existing RG resource name
+
+  ip_configuration {
+    name                          = "internal"
+    subnet_id                     = azurerm_subnet.main.id  # your existing subnet
+    private_ip_address_allocation = "Dynamic"
+  }
+}
+
+resource "azurerm_linux_virtual_machine" "perf_test_vm" {
+  name                = "perf-test-vm"
+  resource_group_name = azurerm_resource_group.main.name
+  location            = "eastus2"
+  size                = "Standard_B1s"   # literal — required for PR patch
+  admin_username      = "azureuser"
+
+  network_interface_ids = [azurerm_network_interface.perf_test_nic.id]
+
+  admin_ssh_key {
+    username   = "azureuser"
+    public_key = file("~/.ssh/id_rsa.pub")  # or your key path
+  }
+
+  os_disk {
+    caching              = "ReadWrite"
+    storage_account_type = "Standard_LRS"
+  }
+
+  source_image_reference {
+    publisher = "Canonical"
+    offer     = "0001-com-ubuntu-server-jammy"
+    sku       = "22_04-lts"
+    version   = "latest"
+  }
+}
