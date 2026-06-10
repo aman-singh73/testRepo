@@ -195,3 +195,21 @@ resource "azurerm_linux_virtual_machine" "perf_test_vm" {
     version   = "latest"
   }
 }
+
+# Module: amannewdevstorage (azurerm_storage_account)
+module "amannewdevstorage" {
+  source = "./modules/azure-storage-account"
+
+  name = "amannewdevstorage"
+  location = "eastus2"
+  resource_group_name = "amanNew-dev-rg"
+  account_tier = "Standard"
+  account_replication_type = "LRS"
+  account_kind = "StorageV2"
+  tags = {
+    cost_center = "TBD",
+    environment = "dev",
+    owner = "TBD",
+    project = "amanNew"
+  }
+}
