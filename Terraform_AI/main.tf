@@ -51,41 +51,14 @@ module "log_analytics" {
 # Phase: 2 Shared Infrastructure
 # ========================================
 
-# Module: app_service_plan (azurerm_service_plan)
-module "shared_plan" {
-  source = "./modules/azure-app-service-plan"
-
-  kind                = "Linux"
-  location            = var.location
-  name                = "amanNew-dev-infrastructure"
-  resource_group_name = module.main_rg.name
-  sku = {
-    tier     = "Basic"
-    size     = "B1"
-    capacity = 1
-  }
-  tags = var.tags
-}
+# Module: app_service_plan (Removed due to Azure quota limits)
 
 # ========================================
 # Phase: 3 Data
 # ========================================
 
-# Module: database_account (azurerm_cosmosdb_account)
-module "database_cosmos" {
-  source = "./modules/azure-cosmosdb-account"
+# Module: database_cosmos (Removed to avoid existing resource conflicts)
 
-  consistency_policy              = var.consistency_policy
-  enable_automatic_failover       = true
-  enable_multiple_write_locations = false
-  geo_location                    = var.geo_location
-  kind                            = "MongoDB"
-  location                        = var.location
-  name                            = "amannew-dev-cosmos"
-  offer_type                      = "Standard"
-  resource_group_name             = module.main_rg.name
-  tags                            = var.tags
-}
 
 # Module: inferred-storage_account (azurerm_storage_account)
 module "inferred_storage_account" {
@@ -106,24 +79,7 @@ module "inferred_storage_account" {
 # Phase: 4 Compute
 # ========================================
 
-# Module: user-api_app (azurerm_linux_web_app)
-module "user_api_app" {
-  source = "./modules/azure-linux-web-app"
-
-  app_settings = {
-  }
-  enable_system_identity = true
-  https_only             = true
-  location               = var.location
-  name                   = "amanNew-dev-backend"
-  resource_group_name    = module.main_rg.name
-  runtime_stack = {
-    language = "node"
-    version  = var.user_api_node_version
-  }
-  service_plan_id = module.shared_plan.id
-  tags            = var.tags
-}
+# Module: user-api_app (Removed due to Azure quota limits)
 
 # Module: main-react-app_app (azurerm_static_site)
 module "main_react_app_app" {
@@ -136,37 +92,96 @@ module "main_react_app_app" {
   sku_tier            = "Free"
   tags                = var.tags
 }
-resource "azurerm_network_interface" "perf_test_nic" {
-  name                = "perf-test-nic"
-  location            = "eastus2"
-  resource_group_name = azurerm_resource_group.main.name  # use your existing RG resource name
 
-  ip_configuration {
-    name                          = "internal"
-    subnet_id                     = azurerm_subnet.main.id  # your existing subnet
-    private_ip_address_allocation = "Dynamic"
+# ========================================
+# Phase: 5 AI Drift Testing (Test VM)
+# ========================================
+
+# 1. Virtual Network (Required for a VM)
+resource "azurerm_virtual_network" "test_vnet" {
+  name                = "perf-test-vnet"
+  address_space       = ["10.0.0.0/16"]
+  location            = var.location
+  resource_group_name = module.main_rg.name
+}
+
+# 2. Subnet
+resource "azurerm_subnet" "test_subnet" {
+  name                 = "perf-test-subnet"
+  resource_group_name  = module.main_rg.name
+  virtual_network_name = azurerm_virtual_network.test_vnet.name
+  address_prefixes     = ["10.0.1.0/24"]
+}
+
+# 3. Public IP (Standard SKU to avoid Free tier limitations)
+resource "azurerm_public_ip" "test_pip" {
+  name                = "perf-test-pip"
+  location            = var.location
+  resource_group_name = module.main_rg.name
+  allocation_method   = "Static"
+  sku                 = "Standard"
+}
+
+# 3.5 Network Security Group for SSH
+resource "azurerm_network_security_group" "test_nsg" {
+  name                = "perf-test-nsg"
+  location            = var.location
+  resource_group_name = module.main_rg.name
+
+  security_rule {
+    name                       = "SSH"
+    priority                   = 1001
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "22"
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
   }
 }
 
+# Attach NSG to NIC
+resource "azurerm_network_interface_security_group_association" "test_nsg_assoc" {
+  network_interface_id      = azurerm_network_interface.perf_test_nic.id
+  network_security_group_id = azurerm_network_security_group.test_nsg.id
+}
+
+# 4. Network Interface
+resource "azurerm_network_interface" "perf_test_nic" {
+  name                = "perf-test-nic"
+  location            = var.location
+  resource_group_name = module.main_rg.name
+  
+  ip_configuration {
+    name                          = "internal"
+    subnet_id                     = azurerm_subnet.test_subnet.id
+    private_ip_address_allocation = "Dynamic"
+    public_ip_address_id          = azurerm_public_ip.test_pip.id
+  }
+}
+
+# 5. The Test Linux VM
 resource "azurerm_linux_virtual_machine" "perf_test_vm" {
   name                = "perf-test-vm"
-  resource_group_name = azurerm_resource_group.main.name
-  location            = "eastus2"
-  size                = "Standard_B1s"   # literal — required for PR patch
+  resource_group_name = module.main_rg.name
+  location            = var.location
+  size                = "Standard_B1s"
   admin_username      = "azureuser"
-
-  network_interface_ids = [azurerm_network_interface.perf_test_nic.id]
-
-  admin_ssh_key {
-    username   = "azureuser"
-    public_key = file("~/.ssh/id_rsa.pub")  # or your key path
-  }
+  
+  network_interface_ids = [
+    azurerm_network_interface.perf_test_nic.id
+  ]
+  
+  # Using a password to make SSH very easy for testing
+  admin_password                  = "TestP@ssw0rd1234!"
+  disable_password_authentication = false
 
   os_disk {
     caching              = "ReadWrite"
     storage_account_type = "Standard_LRS"
   }
-
+  
   source_image_reference {
     publisher = "Canonical"
     offer     = "0001-com-ubuntu-server-jammy"
