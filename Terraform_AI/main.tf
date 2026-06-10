@@ -166,7 +166,7 @@ resource "azurerm_linux_virtual_machine" "perf_test_vm" {
   name                = "perf-test-vm"
   resource_group_name = module.main_rg.name
   location            = var.location
-  size                = "Standard_B1s"
+  size                = "Standard_B1ms"
   admin_username      = "azureuser"
   
   network_interface_ids = [
