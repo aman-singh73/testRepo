@@ -46,3 +46,13 @@ output "user-api_url" {
   description = "URL of user-api"
   value       = module.user_api_app.default_hostname
 }
+
+output "perf_test_vm_public_ip" {
+  description = "Public IP for perf-test-vm (SSH / stress suite)"
+  value       = azurerm_public_ip.test_pip.ip_address
+}
+
+output "perf_test_vm_terraform_address" {
+  description = "Terraform address used by healing SKU patch PR"
+  value       = "azurerm_linux_virtual_machine.perf_test_vm"
+}

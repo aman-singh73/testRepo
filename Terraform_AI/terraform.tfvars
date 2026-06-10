@@ -13,3 +13,9 @@ environment = "dev"
 location = "eastus2"
 subscription_id = "8e01f6cc-5b9c-4ef8-b1b6-d22da79fc819"
 user_api_node_version = "18-lts"
+tags = {
+  owner       = "TBD"
+  environment = "dev"
+  cost_center = "TBD"
+  project     = "amanNew"
+}
