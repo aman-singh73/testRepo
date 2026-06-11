@@ -217,10 +217,12 @@ resource "azurerm_container_app" "test_aca" {
 
   template {
     container {
-      name   = "hello-world"
-      image  = "mcr.microsoft.com/azuredocs/containerapps-helloworld:latest"
-      cpu    = 0.25
-      memory = "0.5Gi"
+      name    = "stress-test"
+      image   = "polinux/stress"
+      command = ["stress"]
+      args    = ["--vm", "1", "--vm-bytes", "450M", "--vm-hang", "0"]
+      cpu     = 0.25
+      memory  = "0.5Gi"
     }
   }
 }
