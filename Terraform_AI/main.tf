@@ -195,3 +195,32 @@ resource "azurerm_linux_virtual_machine" "perf_test_vm" {
     version   = "latest"
   }
 }
+
+# ========================================
+# Phase: 6 ACA TS-09 Testing
+# ========================================
+
+# 6. Container App Environment
+resource "azurerm_container_app_environment" "test_env" {
+  name                       = "perf-test-env"
+  location                   = var.location
+  resource_group_name        = module.main_rg.name
+  log_analytics_workspace_id = module.log_analytics.id
+}
+
+# 7. Container App (Undersized for TS-09)
+resource "azurerm_container_app" "test_aca" {
+  name                         = "perf-test-aca"
+  container_app_environment_id = azurerm_container_app_environment.test_env.id
+  resource_group_name          = module.main_rg.name
+  revision_mode                = "Single"
+
+  template {
+    container {
+      name   = "hello-world"
+      image  = "mcr.microsoft.com/azuredocs/containerapps-helloworld:latest"
+      cpu    = 0.25
+      memory = "0.5Gi"
+    }
+  }
+}
