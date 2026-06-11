@@ -216,20 +216,6 @@ resource "azurerm_container_app" "test_aca" {
   revision_mode                = "Single"
 
   template {
-
-    min_replicas = 1
-
-    max_replicas = 5
-
-
-    http_scale_rule {
-
-      name                = "platform-http-scale"
-
-      concurrent_requests = 50
-
-    }
-
     container {
       name    = "stress-test"
       image   = "polinux/stress"
