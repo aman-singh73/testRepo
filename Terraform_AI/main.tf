@@ -90,7 +90,12 @@ module "main_react_app_app" {
   resource_group_name = module.main_rg.name
   sku_size            = "Free"
   sku_tier            = "Free"
-  tags                = var.tags
+  tags                = merge(var.tags, {
+    cost_center = "governance-required"
+    environment = "governance-required"
+    owner = "governance-required"
+    project = "governance-required"
+  })
 }
 
 # ========================================
@@ -103,7 +108,12 @@ resource "azurerm_virtual_network" "test_vnet" {
   address_space       = ["10.0.0.0/16"]
   location            = var.location
   resource_group_name = module.main_rg.name
-  tags                = var.tags
+  tags                = merge(var.tags, {
+    cost_center = "TBD"
+    environment = "dev"
+    owner = "TBD"
+    project = "amanNew"
+  })
 }
 
 # 2. Subnet
@@ -121,7 +131,12 @@ resource "azurerm_public_ip" "test_pip" {
   resource_group_name = module.main_rg.name
   allocation_method   = "Static"
   sku                 = "Standard"
-  tags                = var.tags
+  tags                = merge(var.tags, {
+    cost_center = "TBD"
+    environment = "dev"
+    owner = "TBD"
+    project = "amanNew"
+  })
 }
 
 # 3.5 Network Security Group for SSH
@@ -129,7 +144,12 @@ resource "azurerm_network_security_group" "test_nsg" {
   name                = "perf-test-nsg"
   location            = var.location
   resource_group_name = module.main_rg.name
-  tags                = var.tags
+  tags                = merge(var.tags, {
+    cost_center = "TBD"
+    environment = "dev"
+    owner = "TBD"
+    project = "amanNew"
+  })
 
   security_rule {
     name                       = "SSH"
@@ -155,7 +175,12 @@ resource "azurerm_network_interface" "perf_test_nic" {
   name                = "perf-test-nic"
   location            = var.location
   resource_group_name = module.main_rg.name
-  tags                = var.tags
+  tags                = merge(var.tags, {
+    cost_center = "TBD"
+    environment = "dev"
+    owner = "TBD"
+    project = "amanNew"
+  })
 
   ip_configuration {
     name                          = "internal"
@@ -173,7 +198,12 @@ resource "azurerm_linux_virtual_machine" "perf_test_vm" {
   # Literal SKU required for SkuPatchEngine (Create PR path). Keep B1s for upsize PR test.
   size                = "Standard_B1s"
   admin_username      = "azureuser"
-  tags                = var.tags
+  tags                = merge(var.tags, {
+    cost_center = "TBD"
+    environment = "dev"
+    owner = "TBD"
+    project = "amanNew"
+  })
 
   network_interface_ids = [
     azurerm_network_interface.perf_test_nic.id
