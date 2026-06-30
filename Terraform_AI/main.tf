@@ -6,7 +6,7 @@ terraform {
   required_version = ">= 1.5.0"
    backend "azurerm" {
     resource_group_name  = "tfstate-rg"
-    storage_account_name = "amantfstate2026"
+    storage_account_name = "amantfstate2026xyz"
     container_name       = "tfstate"
     key                  = "terraform.tfstate"
   }
