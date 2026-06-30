@@ -226,21 +226,3 @@ resource "azurerm_container_app" "test_aca" {
     }
   }
 }
-
-# Module: amannewdevstorxyz (azurerm_storage_account)
-module "amannewdevstorxyz" {
-  source = "./modules/azure-storage-account"
-
-  name = "amannewdevstorxyz"
-  location = "eastus2"
-  resource_group_name = "amanNew-dev-rg"
-  account_tier = "Standard"
-  account_replication_type = "LRS"
-  account_kind = "StorageV2"
-  tags = {
-    cost_center = "TBD",
-    environment = "dev",
-    owner = "TBD",
-    project = "amanNew"
-  }
-}
