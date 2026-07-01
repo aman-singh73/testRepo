@@ -240,3 +240,21 @@ resource "azurerm_container_app" "test_aca" {
     }
   }
 }
+
+# Module: perf-test-vm_OsDisk_1_ca62d2291b98465db0ceaf1213dbde0b (azurerm_managed_disk)
+module "perf-test-vm_OsDisk_1_ca62d2291b98465db0ceaf1213dbde0b" {
+  source = "./modules/azure-managed-disk"
+
+  name = "perf-test-vm_OsDisk_1_ca62d2291b98465db0ceaf1213dbde0b"
+  location = "eastus2"
+  resource_group_name = "AMANNEW-DEV-RG"
+  storage_account_type = "Standard_LRS"
+  create_option = "Empty"
+  disk_size_gb = 128
+  tags = {
+    cost_center = "TBD",
+    environment = "dev",
+    owner = "TBD",
+    project = "amanNew"
+  }
+}
