@@ -244,3 +244,9 @@ module "perf-test-vm_OsDisk_1_ca62d2291b98465db0ceaf1213dbde0b" {
     project = "amanNew"
   }
 }
+
+
+import {
+  to = module.perf-test-vm_OsDisk_1_ca62d2291b98465db0ceaf1213dbde0b.azurerm_managed_disk.this
+  id = "/subscriptions/e024cc04-bbe6-4d17-8cf9-950081336ef4/resourceGroups/AMANNEW-DEV-RG/providers/Microsoft.Compute/disks/perf-test-vm_OsDisk_1_ca62d2291b98465db0ceaf1213dbde0b"
+}
