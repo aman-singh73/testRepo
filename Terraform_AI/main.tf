@@ -46,11 +46,11 @@ module "log_analytics" {
   retention_in_days   = 30
   sku                 = "PerGB2018"
     tags = {
-    cost_center = "governance-required"
-    environment = "governance-required"
-    owner = "governance-required"
-    project = "governance-required"
-  }
+cost_center = "governance-required"
+environment = "governance-required"
+owner = "governance-required"
+project = "governance-required"
+}
 }
 
 # ========================================
@@ -101,6 +101,11 @@ module "main_react_app_app" {
     environment = "governance-required"
     owner = "governance-required"
     project = "governance-required"
+  }, {
+    cost_center = "governance-required"
+    environment = "governance-required"
+    owner = "governance-required"
+    project = "governance-required"
   })
 }
 
@@ -115,6 +120,11 @@ resource "azurerm_virtual_network" "test_vnet" {
   location            = var.location
   resource_group_name = module.main_rg.name
   tags                = merge(var.tags, {
+    cost_center = "TBD"
+    environment = "dev"
+    owner = "TBD"
+    project = "amanNew"
+  }, {
     cost_center = "TBD"
     environment = "dev"
     owner = "TBD"
@@ -142,6 +152,11 @@ resource "azurerm_public_ip" "test_pip" {
     environment = "dev"
     owner = "TBD"
     project = "amanNew"
+  }, {
+    cost_center = "TBD"
+    environment = "dev"
+    owner = "TBD"
+    project = "amanNew"
   })
 }
 
@@ -151,6 +166,11 @@ resource "azurerm_network_security_group" "test_nsg" {
   location            = var.location
   resource_group_name = module.main_rg.name
   tags                = merge(var.tags, {
+    cost_center = "TBD"
+    environment = "dev"
+    owner = "TBD"
+    project = "amanNew"
+  }, {
     cost_center = "TBD"
     environment = "dev"
     owner = "TBD"
@@ -186,6 +206,11 @@ resource "azurerm_network_interface" "perf_test_nic" {
     environment = "dev"
     owner = "TBD"
     project = "amanNew"
+  }, {
+    cost_center = "TBD"
+    environment = "dev"
+    owner = "TBD"
+    project = "amanNew"
   })
 
   ip_configuration {
@@ -205,6 +230,11 @@ resource "azurerm_linux_virtual_machine" "perf_test_vm" {
   size                = "Standard_B1s"
   admin_username      = "azureuser"
   tags                = merge(var.tags, {
+    cost_center = "TBD"
+    environment = "dev"
+    owner = "TBD"
+    project = "amanNew"
+  }, {
     cost_center = "TBD"
     environment = "dev"
     owner = "TBD"
