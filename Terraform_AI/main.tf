@@ -226,3 +226,20 @@ resource "azurerm_container_app" "test_aca" {
     }
   }
 }
+
+# Module: amandevdrifttest123 (azurerm_storage_account)
+module "amandevdrifttest123" {
+  source = "./modules/azure-storage-account"
+
+  name = "amandevdrifttest123"
+  location = "eastus2"
+  resource_group_name = "amanNew-dev-rg"
+  account_tier = "Standard"
+  account_replication_type = "LRS"
+  account_kind = "StorageV2"
+}
+
+import {
+  to = module.amandevdrifttest123.azurerm_storage_account.this
+  id = "/subscriptions/e024cc04-bbe6-4d17-8cf9-950081336ef4/resourceGroups/amanNew-dev-rg/providers/Microsoft.Storage/storageAccounts/amandevdrifttest123"
+}
